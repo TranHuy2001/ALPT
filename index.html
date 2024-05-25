@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ai là triệu phú</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+        }
+        #quiz-container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        #question-container {
+            margin-bottom: 20px;
+        }
+        #question {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .btn {
+            display: inline-block;
+            width: 49%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="quiz-container">
+    <h1>Ai là triệu phú</h1>
+    <button id="start-btn">Bắt đầu</button>
+    <div id="question-container" class="hide">
+        <div id="question">Câu hỏi</div>
+        <button class="btn">A</button>
+        <button class="btn">B</button>
+        <button class="btn">C</button>
+        <button class="btn">D</button>
+    </div>
+    <button id="next-btn" class="hide">Tiếp theo</button>
+    <h3 id="score">Điểm</h3>
+    <h3 id="previous-score"></h3>
+</div>
+<script>
+    const startButton = document.getElementById('start-btn')
+    const nextButton = document.getElementById('next-btn')
+    const questionContainerElement = document.getElementById('question-container')
+    const questionElement = document.getElementById('question')
+    const answerButtonsElement = Array.from(document.getElementsByClassName('btn'))
+    const scoreElement = document.getElementById('score');
+    const previousScoreElement = document.getElementById('previous-score');
+
+
+    window.onload = function () {
+        previousScoreElement.textContent = 'Điểm lần chơi trước :' + localStorage.getItem('previousScore') || 0;
+
+    }
+    const questions = [
+        {
+            question: 'Thủ đô của Việt Nam là gì?',
+            answers: ['A: Tokyo', 'B: Hà Nội', 'C: Seoul', 'D: Washington'],
+            correctIndex: 1
+        },
+        {
+            question: 'Người anh trai song sinh của Dante trong Devil May Cry 5 tên gì?',
+            answers: ['A: Vergil', 'B: Danta', 'C: Nero', 'D: Spada'],
+            correctIndex: 0
+        },
+        {
+            question: 'Messi là cầu thủ của quốc gia nào?',
+            answers: ['A: Bồ Đào Nha', 'B: Brazil', 'C: Pháp', 'D: Argentina'],
+            correctIndex: 3
+        },
+        {
+            question: 'Quốc gia nào đã vô địch Asian Cup năm 2011 ?',
+            answers: ['A: Nhật Bản', 'B: Hàn Quốc', 'C: Iran', 'D: Qatar'],
+            correctIndex: 0
+        },
+        {
+            question: 'Công Phượng đã sang câu lạc bộ nào của Nhật Bản?',
+            answers: ['A: Vissel Kobe', 'B: FC Tokyo', 'C: Cerezo Osaka', 'D: Yokohama FC'],
+            correctIndex: 3
+        },
+        {
+            question: 'Vùng biển nằm giữa châu Âu và châu Mỹ tên là gì?',
+            answers: ['A: Thái Bình Dương', 'B: Đại Tây Dương', 'C: Bắc Băng Dương', 'D: Ấn Độ Dương'],
+            correctIndex: 1
+        },
+        {
+            question: 'Ba nước Vệt Nam, Lào và Campuchia gọi là bán đảo gì?',
+            answers: ['A: Bán đảo Triều Tiên', 'B: Bán đảo Crimean', 'C: Bán đảo Đông Dương', 'D: Bán đảo Alaska'],
+            correctIndex: 2
+        },
+        {
+            question: 'Messi và đội tuyển Argentina đã vô địch World Cup năm bao nhiêu?',
+            answers: ['A: 2021', 'B: 2014', 'C: 2022', 'D: 2018'],
+            correctIndex: 3
+        },
+        {
+            question: 'Nier-Automata là game do hãng game Nhật Bản nào phát triển?',
+            answers: ['A: Square Enix', 'B: Nintendo', 'C: Capcom', 'D: FromSoftware'],
+            correctIndex: 0
+        },
+        {
+            question: '"vị vua nào mặt sắt đen sì?" là nói về vị vua nào của Việt Nam?',
+            answers: ['A: Lý Thái Tổ', 'B: Ngô Quyền', 'C: Mai Hắc Đế', 'D: Nguyễn Trãi '],
+            correctIndex: 2
+        },
+        {
+            question: 'Ai là ngươời nói câu “ta thà làm quỷ nước Nam chứ không thèm làm vương đất Bắc” ?',
+            answers: ['A: Trần Nhật Duật', 'B: Trần Bình Trọng', 'C: Trần Khánh Dư', 'D: Trần Hưng Đạo'],
+            correctIndex: 1
+        },
+
+    ]
+
+    let currentQuestionIndex = 0
+    let score = 0
+    let gameOver = false
+
+    startButton.addEventListener('click', startGame)
+    nextButton.addEventListener('click', () => {
+        currentQuestionIndex++
+        // isCorrect = false
+        nextButton.classList.add('hide')
+        if (currentQuestionIndex < questions.length) {
+            setNextQuestion()
+        } else {
+            alert('Trò chơi kết thúc.')
+            startButton.innerText = 'Chơi lại'
+            startButton.classList.remove('hide')
+        }
+    })
+
+    function startGame() {
+        if (gameOver) {
+            localStorage.setItem('previousScore', score);
+            previousScoreElement.textContent = 'Điểm lần chơi trước: ' + localStorage.getItem('previousScore');
+
+            return
+        }
+        startButton.classList.add('hide')
+        currentQuestionIndex = 0
+        score = 0
+        scoreElement.textContent = `Điểm: ${score}`
+        questionContainerElement.classList.remove('hide')
+        setNextQuestion()
+    }
+
+    function setNextQuestion() {
+        resetState()
+        showQuestion(questions[currentQuestionIndex])
+    }
+
+    function showQuestion(question) {
+        questionElement.innerText = question.question
+        answerButtonsElement.forEach((button, index) => {
+            button.innerText = question.answers[index]
+            button.disabled = false
+            button.addEventListener('click', selectAnswer)
+        })
+    }
+
+    function resetState() {
+        nextButton.classList.add('hide')
+        answerButtonsElement.forEach(button => {
+            button.disabled = true
+            button.classList.remove('correct', 'wrong')
+        })
+    }
+
+    function selectAnswer(e) {
+        const selectedButton = e.target
+        const selectedIndex = answerButtonsElement.findIndex(btn => btn === selectedButton)
+        if (selectedIndex === questions[currentQuestionIndex].correctIndex) {
+            selectedButton.classList.add('correct')
+            score++
+            scoreElement.textContent = `Điểm: ${score}`
+            alert('Bạn đã trả lời đúng')
+            gameOver = false
+        } else {
+            selectedButton.classList.add('wrong')
+            alert('Bạn đã trả lời sai. Trò chơi kết thúc.')
+            nextButton.classList.add('hide')
+            startButton.innerText = 'Chơi lại'
+            startButton.classList.remove('hide')
+            questionContainerElement.classList.add('hide')
+            gameOver = true
+
+            localStorage.setItem('previousScore', score)
+            previousScoreElement.textContent = 'Điểm lần chơi trước: ' + localStorage.getItem('previousScore');
+            return
+        }
+
+        if(currentQuestionIndex === questions.length - 1) {
+            gameOver = true
+        }
+
+        if(!gameOver) {
+            nextButton.classList.remove('hide')
+        }
+        nextButton.classList.remove('hide')
+
+    }
+</script>
+</body>
+</html>
